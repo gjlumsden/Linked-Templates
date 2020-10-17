@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"adminUsername": {
+			"type": "string"
+		},
+		"adminPassword": {
+			"type": "securestring"
+		},
+		"nicResourceId": {
+			"type": "string"
+		},
+		"vmName": {
+			"type": "string"
+		},
+		"osDiskName": {
+			"type": "string"
+		}
+	},
+	"resources": [
+		{
+			"name": "[parameters('vmName')]",
+			"type": "Microsoft.Compute/virtualMachines",
+			"apiVersion": "2020-06-01",
+			"location": "[resourceGroup().location]",
+			"tags": {
+				"displayName": "[parameters('vmName')]"
+			},
+			"properties": {
+				"hardwareProfile": {
+					"vmSize": "Standard_B1s"
+				},
+				"osProfile": {
+					"computerName": "[parameters('vmName')]",
+					"adminUsername": "[parameters('adminUsername')]",
+					"adminPassword": "[parameters('adminPassword')]"
+				},
+				"storageProfile": {
+					"imageReference": {
+						"publisher": "Canonical",
+						"offer": "UbuntuServer",
+						"sku": "16.04-LTS",
+						"version": "latest"
+					},
+					"osDisk": {
+						"name": "[parameters('osDiskName')]",
+						"caching": "ReadWrite",
+						"createOption": "FromImage"
+					}
+				},
+				"networkProfile": {
+					"networkInterfaces": [
+						{
+							"id": "[parameters('nicResourceId')]"
+						}
+					]
+				},
+				"diagnosticsProfile": {
+					"bootDiagnostics": {
+						"enabled": true
+					}
+				}
+			}
+		}
+	]
+}
